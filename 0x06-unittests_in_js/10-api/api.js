@@ -9,22 +9,21 @@ const PORT = 7865;
 
 // Default route
 app.get('/', (req, res) => {
-  res.send('Welcome to the payment system');
+  res.status(200).send('Welcome to the payment system');
 });
 
 // Route to handle cart payment methods
 app.get('/cart/:id', (req, res) => {
   const { id } = req.params;
-  if (isNaN(id)) {
-    res.status(400).send('Invalid cart ID');
-  } else {
-    res.send(`Payment methods for cart ${id}`);
+  if (!/^\d+$/.test(id)) {
+    return res.status(400).send('Invalid cart ID');
   }
+  res.status(200).send(`Payment methods for cart ${id}`);
 });
 
 // Endpoint to get available payment methods
 app.get('/available_payments', (req, res) => {
-  res.json({
+  res.status(200).json({
     payment_methods: {
       credit_cards: true,
       paypal: false
@@ -36,7 +35,7 @@ app.get('/available_payments', (req, res) => {
 app.post('/login', (req, res) => {
   const { userName } = req.body;
   if (userName) {
-    res.send(`Welcome ${userName}`);
+    res.status(200).send(`Welcome ${userName}`);
   } else {
     res.status(400).send('Missing userName');
   }
@@ -48,3 +47,4 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
