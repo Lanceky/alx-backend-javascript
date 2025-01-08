@@ -5,7 +5,21 @@ app.use(express.json());
 
 const PORT = 7865;
 
-// GET /available_payments endpoint
+// Route GET /
+app.get('/', (req, res) => {
+    res.send('Welcome to the payment system');
+});
+
+// Route GET /cart/:id
+app.get('/cart/:id', (req, res) => {
+    const { id } = req.params;
+    if (!/^\d+$/.test(id)) {
+        return res.status(400).send('Invalid cart id');
+    }
+    res.send(`Payment methods for cart ${id}`);
+});
+
+// Route GET /available_payments
 app.get('/available_payments', (req, res) => {
     res.json({
         payment_methods: {
@@ -15,7 +29,7 @@ app.get('/available_payments', (req, res) => {
     });
 });
 
-// POST /login endpoint
+// Route POST /login
 app.post('/login', (req, res) => {
     const { userName } = req.body;
     if (!userName) {
