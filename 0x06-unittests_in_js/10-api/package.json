@@ -1,10 +1,8 @@
-i{
+{
   "name": "10-api",
   "version": "1.0.0",
-  "description": "API with endpoints for payments and login",
-  "main": "api.js",
   "scripts": {
-    "start": "node api.js",
+    "start": "./start_express_server.sh",
     "test": "jest --testEnvironment=node"
   },
   "dependencies": {
@@ -14,8 +12,6 @@ i{
   "devDependencies": {
     "jest": "^29.0.0",
     "supertest": "^6.3.3"
-  },
-  "author": "",
-  "license": "ISC"
+  }
 }
 
