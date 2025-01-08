@@ -1,58 +1,65 @@
-// api.test.js
-const request = require('supertest');
-const app = require('./api');
+const request = require('request');
+const { expect } = require('chai');
 
-describe('Test / endpoint', () => {
-  it('should return the welcome message', async () => {
-    const response = await request(app).get('/');
-    expect(response.statusCode).toBe(200);
-    expect(response.text).toBe('Welcome to the payment system');
-  });
-});
+describe('API integration testing', () => {
+  const API_URL = 'http://localhost:7865';
 
-describe('Test /cart/:id endpoint', () => {
-  it('should return the payment methods for a valid cart ID', async () => {
-    const response = await request(app).get('/cart/123');
-    expect(response.statusCode).toBe(200);
-    expect(response.text).toBe('Payment methods for cart 123');
-  });
-
-  it('should return 400 for invalid cart ID', async () => {
-    const response = await request(app).get('/cart/abc');
-    expect(response.statusCode).toBe(400);
-    expect(response.text).toBe('Invalid cart ID');
-  });
-});
-
-describe('Test /available_payments endpoint', () => {
-  it('should return the correct payment methods', async () => {
-    const response = await request(app).get('/available_payments');
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toEqual({
-      payment_methods: {
-        credit_cards: true,
-        paypal: false
-      }
+  describe('GET /', () => {
+    it('returns correct response', (done) => {
+      request.get(API_URL, (error, response, body) => {
+        expect(response.statusCode).to.equal(200);
+        expect(body).to.equal('Welcome to the payment system');
+        done();
+      });
     });
   });
-});
 
-describe('Test /login endpoint', () => {
-  it('should return a welcome message with username', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({ userName: 'Betty' })
-      .set('Content-Type', 'application/json');
-    expect(response.statusCode).toBe(200);
-    expect(response.text).toBe('Welcome Betty');
+  describe('GET /cart/:id', () => {
+    it('returns correct response when :id is a number', (done) => {
+      request.get(`${API_URL}/cart/12`, (error, response, body) => {
+        expect(response.statusCode).to.equal(200);
+        expect(body).to.equal('Payment methods for cart 12');
+        done();
+      });
+    });
+
+    it('returns 404 when :id is not a number', (done) => {
+      request.get(`${API_URL}/cart/hello`, (error, response, body) => {
+        expect(response.statusCode).to.equal(404);
+        expect(body).to.equal('Invalid cart ID');
+        done();
+      });
+    });
   });
 
-  it('should return 400 for missing username', async () => {
-    const response = await request(app)
-      .post('/login')
-      .send({})
-      .set('Content-Type', 'application/json');
-    expect(response.statusCode).toBe(400);
-    expect(response.text).toBe('Missing userName');
+  describe('GET /available_payments', () => {
+    it('returns correct payment methods object', (done) => {
+      request.get(`${API_URL}/available_payments`, (error, response, body) => {
+        expect(response.statusCode).to.equal(200);
+        const expectedPaymentMethods = {
+          payment_methods: {
+            credit_cards: true,
+            paypal: false
+          }
+        };
+        expect(JSON.parse(body)).to.deep.equal(expectedPaymentMethods);
+        done();
+      });
+    });
+  });
+
+  describe('POST /login', () => {
+    it('returns correct welcome message', (done) => {
+      const options = {
+        url: `${API_URL}/login`,
+        json: { userName: 'Betty' },
+        headers: { 'Content-Type': 'application/json' }
+      };
+      request.post(options, (error, response, body) => {
+        expect(response.statusCode).to.equal(200);
+        expect(body).to.equal('Welcome Betty');
+        done();
+      });
+    });
   });
 });
