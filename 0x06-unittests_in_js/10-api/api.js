@@ -1,29 +1,25 @@
-// api.js
 const express = require('express');
+
 const app = express();
-const bodyParser = require('body-parser');
+const port = 7865;
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-const PORT = 7865;
-
-// Default route
 app.get('/', (req, res) => {
-  res.status(200).send('Welcome to the payment system');
+  res.send('Welcome to the payment system');
 });
 
-// Route to handle cart payment methods
 app.get('/cart/:id', (req, res) => {
-  const { id } = req.params;
-  if (!/^\d+$/.test(id)) {
-    return res.status(400).send('Invalid cart ID');
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    res.status(404).send('Invalid cart ID');
+  } else {
+    res.send(`Payment methods for cart ${id}`);
   }
-  res.status(200).send(`Payment methods for cart ${id}`);
 });
 
-// Endpoint to get available payment methods
 app.get('/available_payments', (req, res) => {
-  res.status(200).json({
+  res.json({
     payment_methods: {
       credit_cards: true,
       paypal: false
@@ -31,20 +27,13 @@ app.get('/available_payments', (req, res) => {
   });
 });
 
-// Endpoint to handle login
 app.post('/login', (req, res) => {
   const { userName } = req.body;
-  if (userName) {
-    res.status(200).send(`Welcome ${userName}`);
-  } else {
-    res.status(400).send('Missing userName');
-  }
+  res.send(`Welcome ${userName}`);
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`API available on localhost port ${PORT}`);
+app.listen(port, () => {
+  console.log(`API available on localhost port ${port}`);
 });
 
 module.exports = app;
-
