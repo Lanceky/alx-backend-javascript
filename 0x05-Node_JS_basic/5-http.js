@@ -1,14 +1,14 @@
 const http = require('http');
 const { readFile } = require('fs').promises;
 
-const processStudentData = async (filePath) => {
+const countStudents = async (path) => {
   try {
-    const data = await readFile(filePath, 'utf8');
-    const lines = data.trim().split('\n').slice(1); // Remove header and empty lines
+    const data = await readFile(path, 'utf8');
+    const lines = data.trim().split('\n').slice(1);
     const students = {};
-    
-    lines.forEach(line => {
-      if (line.trim()) { // Skip empty lines
+
+    lines.forEach((line) => {
+      if (line.trim()) {
         const [firstname, , , field] = line.split(',');
         if (!students[field]) {
           students[field] = { count: 0, names: [] };
@@ -32,24 +32,27 @@ const processStudentData = async (filePath) => {
   }
 };
 
-const app = http.createServer(async (req, res) => {
+const app = http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
-  
+
   if (req.url === '/') {
     res.end('Hello ALX!');
   } else if (req.url === '/students') {
-    try {
-      const databasePath = process.argv[2];
-      const studentData = await processStudentData(databasePath);
-      res.end(studentData);
-    } catch (error) {
-      res.end(error.message);
-    }
+    countStudents(process.argv[2])
+      .then((data) => {
+        res.end(data);
+      })
+      .catch((error) => {
+        res.statusCode = 404;
+        res.end(error.message);
+      });
   } else {
-    res.end('Not found');
+    res.statusCode = 404;
+    res.end('Not found\n');
   }
 });
 
-app.listen(1245);
+const port = 1245;
+app.listen(port);
 
 module.exports = app;
