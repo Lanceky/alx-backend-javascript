@@ -11,8 +11,9 @@ function calculateNumber(type, a, b) {
       return 'Error';
     }
     return roundedA / roundedB;
+  } else {
+    throw new Error('Invalid operation type');
   }
-  throw new Error('Invalid operation type');
 }
 
 module.exports = calculateNumber;
