@@ -16,8 +16,11 @@ const countStudents = async (path) => {
       fields[field].count += 1;
       fields[field].names.push(firstName);
     });
-    Object.entries(fields).forEach(([field, data]) => {
+    Object.entries(fields).forEach(([field, data], idx) => {
       output += `Number of students in ${field}: ${data.count}. List: ${data.names.join(', ')}`;
+      if (idx < Object.entries(fields).length - 1) {
+        output += '\n';
+      }
     });
     return output;
   } catch (error) {
@@ -26,25 +29,34 @@ const countStudents = async (path) => {
 };
 
 const app = http.createServer((req, res) => {
-  res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
 
-  if (req.url === '/') {
-    res.end('Hello ALX!');
-  } else if (req.url === '/students') {
-    countStudents(process.argv[2])
-      .then((output) => {
-        res.end(`This is the list of our students\n${output}`);
-      })
-      .catch(() => {
-        res.end('This is the list of our students\nCannot load the database');
-      });
-  } else {
-    res.statusCode = 404;
-    res.end();
+  switch (req.url) {
+    case '/':
+      res.statusCode = 200;
+      res.end('Hello ALX!');
+      break;
+
+    case '/students':
+      countStudents(process.argv[2])
+        .then((output) => {
+          res.statusCode = 200;
+          res.end(`This is the list of our students\n${output}`);
+        })
+        .catch((error) => {
+          res.statusCode = 404;
+          res.end('This is the list of our students\nCannot load the database');
+        });
+      break;
+
+    default:
+      res.statusCode = 404;
+      res.end('');
   }
 });
 
-app.listen(1245);
-
 module.exports = app;
+
+if (require.main === module) {
+  app.listen(1245);
+}
