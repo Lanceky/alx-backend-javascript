@@ -1,16 +1,19 @@
-const {createServer} = require('http');
+const http = require('http');
 
-const hostname = '127.0.0.1';
-const port = 1245;
-
-const app = createServer((req, res)=>{
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain')
-  res.end('Hello ALX!');
+const app = http.createServer((req, res) => {
+  if (req.url === '/') {
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Status: 200 - Hello ALX!');
+  } else {
+    res.statusCode = 404;
+    res.setHeader('Content-Type', 'text/plain');
+    res.end('Status: 404 - Not Found');
+  }
 });
 
-app.listen(port, hostname, ()=>{
-  console.log(`server listening at ${hostname}:${port}`);
+app.listen(1245, () => {
+  console.log('Server is listening on port 1245');
 });
 
 module.exports = app;
