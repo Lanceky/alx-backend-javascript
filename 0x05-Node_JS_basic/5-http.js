@@ -43,7 +43,7 @@ const app = http.createServer(async (req, res) => {
 
   try {
     if (url === '/') {
-      res.end('Hello ALX!');
+      res.end('Hello Holberton School!');
     } else if (url === '/students') {
       const data = await countStudents(process.argv[2]);
       res.end(data);
