@@ -2,14 +2,14 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const countStudents = (filePath) => {
-  return new Promise((resolve, reject) => {
+const countStudents = (filePath) =>
+  new Promise((resolve, reject) => {
     fs.readFile(filePath, 'utf-8', (err, data) => {
       if (err) {
         reject(new Error('Cannot load the database'));
       } else {
         const lines = data.trim().split('\n').filter((line) => line.length > 0);
-        const students = lines.slice(1);
+        const students = lines.slice(1); // Skip the header row
         const fields = {};
 
         students.forEach((student) => {
@@ -24,7 +24,7 @@ const countStudents = (filePath) => {
         const summary = [`Number of students: ${students.length}`];
         Object.entries(fields).forEach(([field, data]) => {
           summary.push(
-            `Number of students in ${field}: ${data.count}. List: ${data.names.join(', ')}`
+            `Number of students in ${field}: ${data.count}. List: ${data.names.join(', ')}`,
           );
         });
 
@@ -32,7 +32,6 @@ const countStudents = (filePath) => {
       }
     });
   });
-};
 
 const app = http.createServer((req, res) => {
   const filePath = path.resolve(__dirname, process.argv[2]);
